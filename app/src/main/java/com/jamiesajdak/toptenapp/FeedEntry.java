@@ -4,7 +4,7 @@ public class FeedEntry {
     private String name;
     private String artist;
     private String releaseDate;
-    private String summary;
+    private String price;
     private String imageURL;
 
 
@@ -32,12 +32,12 @@ public class FeedEntry {
         this.releaseDate = releaseDate;
     }
 
-    public String getSummary() {
-        return summary;
+    public String getPrice() {
+        return price;
     }
 
-    public void setSummary(String summary) {
-        this.summary = summary;
+    public void setPrice(String price) {
+        this.price = price;
     }
 
     public String getImageURL() {
@@ -52,7 +52,7 @@ public class FeedEntry {
     public String toString() {
         return  "name=" + name + '\n' +
                 "artist=" + artist + '\n' +
-                "releaseDate=" + releaseDate + '\n' +
+                "price=" + price + '\n' +
                 "imageURL=" + imageURL + '\n' +
                 '}';
     }

@@ -54,8 +54,8 @@ public class ParseApplications {
                                 currentRecord.setName(textVale);
                             } else if ("artist".equalsIgnoreCase(tagName)) {
                             currentRecord.setArtist(textVale);
-                            } else if ("releaseDate".equalsIgnoreCase(tagName)) {
-                            currentRecord.setReleaseDate(textVale);
+                            } else if ("price".equalsIgnoreCase(tagName)) {
+                            currentRecord.setPrice(textVale);
                             } else if ("image".equalsIgnoreCase(tagName)) {
                             currentRecord.setImageURL(textVale);
                         }
