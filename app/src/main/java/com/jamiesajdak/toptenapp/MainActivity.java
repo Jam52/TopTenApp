@@ -4,6 +4,8 @@ import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
@@ -20,6 +22,8 @@ import java.util.stream.Stream;
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
     private ListView listApps;
+    private  String feedUrl = "http://ax.itunes.apple.com/WebObjects/MZStoreServices.woa/ws/RSS/topfreeapplications/limit=%d/xml";
+    private int feedLimit = 10;
 
 
     @Override
@@ -28,11 +32,64 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         listApps = (ListView) findViewById(R.id.xmlListView);
 
-        Log.d(TAG, "onCreate: starting AsyncTask");
-        DownloadData downloadData = new DownloadData();
-        downloadData.execute("http://ax.itunes.apple.com/WebObjects/MZStoreServices.woa/ws/RSS/topalbums/limit=20/xml");
+//        Log.d(TAG, "onCreate: starting AsyncTask");
+//        DownloadData downloadData = new DownloadData();
+//        downloadData.execute("http://ax.itunes.apple.com/WebObjects/MZStoreServices.woa/ws/RSS/topalbums/limit=20/xml");
+        downloadUrl(String.format(feedUrl, feedLimit));
 
         Log.d(TAG, "onCreate: done.");
+
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.feeds_menu, menu);
+        if (feedLimit == 10) {
+            menu.findItem(R.id.mnu10).setChecked(true);
+        } else {
+            menu.findItem(R.id.mnu25).setChecked(true);
+        }
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        switch (id) {
+            case R.id.mnuFree:
+                feedUrl = "http://ax.itunes.apple.com/WebObjects/MZStoreServices.woa/ws/RSS/topfreeapplications/limit=%d/xml";
+                break;
+            case R.id.mnuPaid:
+                feedUrl = "http://ax.itunes.apple.com/WebObjects/MZStoreServices.woa/ws/RSS/toppaidapplications/limit=%d/xml";
+                break;
+            case R.id.mnuAlbums:
+                feedUrl = "http://ax.itunes.apple.com/WebObjects/MZStoreServices.woa/ws/RSS/topalbums/limit=%d/xml";
+                break;
+            case R.id.mnu10:
+            case R.id.mnu25:
+                if(!item.isChecked()){
+                    item.setChecked(true);
+                    feedLimit = 35 - feedLimit;
+                    Log.d(TAG, "onOptionsItemSelected: " +item.getTitle() + " setting feed limit to: " + feedLimit);
+                } else {
+                    Log.d(TAG, "onOptionsItemSelected: " +item.getTitle() + " feed Limit unchanged " );
+                }
+                break;
+            default:
+                return super.onOptionsItemSelected(item);
+
+        }
+
+        downloadUrl(String.format(feedUrl, feedLimit));
+        return true;
+    }
+
+    private void downloadUrl(String feedUrl) {
+        Log.d(TAG, "downloadUrl: Starting Async Task");
+        DownloadData downloadData = new DownloadData();
+        downloadData.execute(feedUrl);
+        Log.d(TAG, "downloadUrl: download done");
 
     }
 
@@ -42,7 +99,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(String s) {
             super.onPostExecute(s);
-            Log.d(TAG, "onPostExecute: parameter is " + s);
+//            Log.d(TAG, "onPostExecute: parameter is " + s);
             ParseApplications parseApplications = new ParseApplications();
             parseApplications.parse(s);
 
