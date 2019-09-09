@@ -24,6 +24,9 @@ public class MainActivity extends AppCompatActivity {
     private ListView listApps;
     private  String feedUrl = "http://ax.itunes.apple.com/WebObjects/MZStoreServices.woa/ws/RSS/topfreeapplications/limit=%d/xml";
     private int feedLimit = 10;
+    private String feedCashedUrl = "INVALIDATED";
+    public static final String STATE_URL = "feedURL";
+    public static final String STATE_LIMIT = "finalLimit";
 
 
     @Override
@@ -39,6 +42,10 @@ public class MainActivity extends AppCompatActivity {
 
         Log.d(TAG, "onCreate: done.");
 
+        if(savedInstanceState != null) {
+            feedUrl = savedInstanceState.getString(STATE_URL);
+            feedLimit = savedInstanceState.getInt(STATE_LIMIT);
+        }
     }
 
     @Override
@@ -46,6 +53,7 @@ public class MainActivity extends AppCompatActivity {
         getMenuInflater().inflate(R.menu.feeds_menu, menu);
         if (feedLimit == 10) {
             menu.findItem(R.id.mnu10).setChecked(true);
+            feedCashedUrl = feedUrl;
         } else {
             menu.findItem(R.id.mnu25).setChecked(true);
         }
@@ -76,6 +84,9 @@ public class MainActivity extends AppCompatActivity {
                     Log.d(TAG, "onOptionsItemSelected: " +item.getTitle() + " feed Limit unchanged " );
                 }
                 break;
+            case R.id.mnuRefresh:
+                feedCashedUrl = "INVALIDATED";
+                break;
             default:
                 return super.onOptionsItemSelected(item);
 
@@ -85,11 +96,22 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        outState.putString(STATE_URL, feedUrl);
+        outState.putInt(STATE_LIMIT, feedLimit);
+    }
+
     private void downloadUrl(String feedUrl) {
-        Log.d(TAG, "downloadUrl: Starting Async Task");
-        DownloadData downloadData = new DownloadData();
-        downloadData.execute(feedUrl);
-        Log.d(TAG, "downloadUrl: download done");
+        if(!feedUrl.equals(feedCashedUrl)) {
+            Log.d(TAG, "downloadUrl: Starting Async Task");
+            DownloadData downloadData = new DownloadData();
+            downloadData.execute(feedUrl);
+            Log.d(TAG, "downloadUrl: download done");
+        } else {
+            Log.d(TAG, "downloadUrl: URL not changed");
+        }
+
 
     }
 
